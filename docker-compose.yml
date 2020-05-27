@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+   wordpress-db:
+     image: mariadb:5.5
+     restart: always
+     ports:
+       - "3307:3306"
+     volumes:
+      -  ./mysql:/var/lib/mysql
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       
+   wordpress-php:
+     image: wordpress:php7.1
+     restart: always
+     ports:
+       - "80:80"
+     links:
+       - wordpress-db:mysql
+     volumes:
+       - ./wordpress:/var/www/html
+     environment:
+       WORDPRESS_DB_HOST: mysql
+       WORDPRESS_DB_USER: root
+       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_NAME: wordpress
+
+   wordpress-pma:
+     image: phpmyadmin/phpmyadmin:latest
+     restart: always
+     ports:
+       - "8081:80"
+     links:
+       - wordpress-db:db
+     volumes:
+       - /sessions
+     environment:
+       PMA_USER: root
+       PMA_PASSWORD: wordpress
+       
